@@ -150,7 +150,7 @@ function App() {
             );
           })}
         </SudokuList>
-        <div>
+        <SudokuGrid>
           {sudoku.map((row, i) => (
             <Row key={i} $highlighted={rowHighlighted(i)} $error={hasError}>
               {row.map((cell, j) => (
@@ -164,13 +164,18 @@ function App() {
               ))}
             </Row>
           ))}
-        </div>
+        </SudokuGrid>
       </Visual>
     </Main>
   );
 }
 
 export default App;
+
+const SudokuGrid = styled.div`
+  border: 1px solid grey;
+  height: fit-content;
+`;
 
 const Visual = styled.div`
   display: flex;
@@ -195,7 +200,9 @@ const SudokuList = styled.ol`
 
 const SudokuListItem = styled.li<{ $valid: boolean; $selected?: boolean }>`
   --color: ${(props) => (props.$valid ? "green" : "red")};
-  --border: ${(props) => (props.$selected ? "3px" : "1px")};
+  --border: ${(props) => (props.$selected ? "2px" : "1px")};
+  --bg: ${(props) => (props.$selected ? "hsl(0, 0%, 20%)" : "transparent")};
+  background-color: var(--bg);
   border: var(--border) solid grey;
   border-radius: 4px;
   padding: 8px;
