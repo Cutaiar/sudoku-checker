@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import "./App.css";
 import styled from "styled-components";
 import React from "react";
 import { Sudoku, sudokus } from "./sudokus";
@@ -129,44 +128,59 @@ function App() {
 
   return (
     <Main>
-      <SudokuList>
-        {sudokus.map((s, i) => {
-          return (
-            <SudokuListItem
-              $valid={s.valid}
-              $selected={i === idx}
-              onClick={() => setIdx(i)}
-              key={i}
-            >
-              {(s.valid ? "✅ " : "❌ ") + s.sudoku[0].join("")}
-            </SudokuListItem>
-          );
-        })}
-      </SudokuList>
       <div>
-        {sudoku.map((row, i) => (
-          <Row key={i} $highlighted={rowHighlighted(i)} $error={hasError}>
-            {row.map((cell, j) => (
-              <Cell
-                key={j}
-                $highlighted={cellHighlighted(i, j)}
-                $error={hasError}
-              >
-                {cell}
-              </Cell>
-            ))}
-          </Row>
-        ))}
+        <Title>Visual Sudoku Checker</Title>
+        <Subtitle>
+          Select a sudoku on the left and watch as its rows, columns, and
+          regions are checked
+        </Subtitle>
       </div>
+      <Visual>
+        <SudokuList>
+          {sudokus.map((s, i) => {
+            return (
+              <SudokuListItem
+                $valid={s.valid}
+                $selected={i === idx}
+                onClick={() => setIdx(i)}
+                key={i}
+              >
+                {(s.valid ? "✅ " : "❌ ") + s.sudoku[0].join("")}
+              </SudokuListItem>
+            );
+          })}
+        </SudokuList>
+        <div>
+          {sudoku.map((row, i) => (
+            <Row key={i} $highlighted={rowHighlighted(i)} $error={hasError}>
+              {row.map((cell, j) => (
+                <Cell
+                  key={j}
+                  $highlighted={cellHighlighted(i, j)}
+                  $error={hasError}
+                >
+                  {cell}
+                </Cell>
+              ))}
+            </Row>
+          ))}
+        </div>
+      </Visual>
     </Main>
   );
 }
 
 export default App;
 
-const Main = styled.div`
+const Visual = styled.div`
   display: flex;
   flex-direction: row;
+  gap: 32px;
+`;
+
+const Main = styled.div`
+  display: flex;
+  flex-direction: column;
   gap: 32px;
 `;
 
@@ -197,6 +211,7 @@ const Cell = styled.span<{ $highlighted?: boolean; $error?: boolean }>`
   border: 1px solid grey;
   background-color: ${(props) =>
     props.$highlighted ? "var(--color)" : "transparent"};
+  text-align: center;
 `;
 
 const Row = styled.div<{ $highlighted?: boolean; $error?: boolean }>`
@@ -205,6 +220,19 @@ const Row = styled.div<{ $highlighted?: boolean; $error?: boolean }>`
   flex-direction: row;
   background-color: ${(props) =>
     props.$highlighted ? "var(--color)" : "transparent"};
+`;
+
+const Title = styled.h1`
+  font-size: 3.2rem;
+  line-height: 1.1;
+  margin: 0;
+`;
+
+const Subtitle = styled.p`
+  color: grey;
+  margin: 0;
+  margin-bottom: 32px;
+  font-size: 1.5rem;
 `;
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
