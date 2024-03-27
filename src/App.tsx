@@ -201,7 +201,7 @@ const SudokuList = styled.ol`
 const SudokuListItem = styled.li<{ $valid: boolean; $selected?: boolean }>`
   --color: ${(props) => (props.$valid ? "green" : "red")};
   --border: ${(props) => (props.$selected ? "2px" : "1px")};
-  --bg: ${(props) => (props.$selected ? "hsl(0, 0%, 20%)" : "transparent")};
+  --bg: ${(props) => (props.$selected ? "hsl(0 0% 40%/30%)" : "transparent")};
   background-color: var(--bg);
   border: var(--border) solid grey;
   border-radius: 4px;
