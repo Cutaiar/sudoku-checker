@@ -1,5 +1,7 @@
 # Visual Sudoku Checker
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/c904e4ae-c208-49b5-97f5-7269131f14a7/deploy-status)](https://app.netlify.com/sites/illustrious-bunny-4d884f/deploys)
+
 Check a sudoku for validity and visualize the process.
 
 Written with `React` + `TypeScript` + `Vite`
