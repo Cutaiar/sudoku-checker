@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import React from "react";
 import { Sudoku, sudokus } from "./sudokus";
+import { Readout } from "./Readout";
 
 /**
  * Build an array of regions where each region is an array of indices (i.e. [0,0]).
@@ -25,7 +26,11 @@ const buildRegionIndicesIndices = () => {
 
 const regionIndices = buildRegionIndicesIndices();
 
-type GroupType = "row" | "col" | "region";
+type GroupType = "row" | "column" | "region";
+export type Error = {
+  type: GroupType;
+  index: number;
+};
 
 function App() {
   // State for if a row, column, or group is highlighted
@@ -40,7 +45,8 @@ function App() {
   >(undefined);
 
   // State for if an error is found
-  const [hasError, setHasError] = useState(false);
+  const [error, setError] = useState<Error | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(true);
 
   // State for the selected sudoku
   const [selectedSudokuIndex, setSelectedSudokuIndex] = useState(0);
@@ -51,7 +57,8 @@ function App() {
   // When the selectedSudokuIndex is changed, reset all highlighting and load the corresponding puzzle
   useEffect(() => {
     // Reset highlighting
-    setHasError(false);
+    setError(undefined);
+    setIsLoading(true);
     setHighlightedRow(undefined);
     setHighlightedCol(undefined);
     setHighlightedRegion(undefined);
@@ -86,7 +93,7 @@ function App() {
           case "row":
             setHighlightedRow(i);
             break;
-          case "col":
+          case "column":
             setHighlightedCol(i);
             break;
           case "region":
@@ -98,8 +105,8 @@ function App() {
         await sleep(300);
 
         if (!isValid(group)) {
-          console.log(`Error in ${type} ${i}`);
-          setHasError(true);
+          // console.log(`Error in ${type} ${i}`);
+          setError({ type, index: i });
           return false;
         }
       }
@@ -114,7 +121,7 @@ function App() {
     // Assemble a list of groups to check
     const groups: Record<GroupType, number[][]> = {
       row: sudoku,
-      col: transpose(sudoku),
+      column: transpose(sudoku),
       region: regions,
     };
 
@@ -129,6 +136,11 @@ function App() {
       setHighlightedRow(undefined);
       setHighlightedCol(undefined);
       setHighlightedRegion(undefined);
+    }
+
+    // If this finished organically, we are done loading
+    if (!signal.aborted) {
+      setIsLoading(false);
     }
   };
 
@@ -165,21 +177,24 @@ function App() {
             );
           })}
         </SudokuList>
-        <SudokuGrid>
-          {sudoku.map((row, i) => (
-            <Row key={i} $error={hasError}>
-              {row.map((cell, j) => (
-                <Cell
-                  key={j}
-                  $highlighted={cellHighlighted(i, j)}
-                  $error={hasError}
-                >
-                  {cell}
-                </Cell>
-              ))}
-            </Row>
-          ))}
-        </SudokuGrid>
+        <GridWrapper>
+          <SudokuGrid>
+            {sudoku.map((row, i) => (
+              <Row key={i} $error={!!error}>
+                {row.map((cell, j) => (
+                  <Cell
+                    key={j}
+                    $highlighted={cellHighlighted(i, j)}
+                    $error={!!error}
+                  >
+                    {cell}
+                  </Cell>
+                ))}
+              </Row>
+            ))}
+          </SudokuGrid>
+          <Readout indeterminate={isLoading} error={error} />
+        </GridWrapper>
       </Visual>
     </Main>
   );
@@ -208,13 +223,18 @@ const Title = styled.h1`
 const Subtitle = styled.p`
   color: grey;
   margin: 0;
-  margin-bottom: 32px;
   font-size: 1.5rem;
 `;
 
 const SudokuGrid = styled.div`
   border: 1px solid grey;
   height: fit-content;
+`;
+
+const GridWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 `;
 
 const SudokuList = styled.ol`
@@ -227,6 +247,7 @@ const SudokuList = styled.ol`
 `;
 
 const SudokuListItem = styled.li<{ $valid: boolean; $selected?: boolean }>`
+  font-family: "Lucida Console", Courier, monospace;
   --color: ${(props) => (props.$valid ? "green" : "red")};
   --border: ${(props) => (props.$selected ? "2px" : "1px")};
   --bg: ${(props) => (props.$selected ? "hsl(0 0% 40%/30%)" : "transparent")};
@@ -241,6 +262,7 @@ const SudokuListItem = styled.li<{ $valid: boolean; $selected?: boolean }>`
 `;
 
 const Cell = styled.span<{ $highlighted?: boolean; $error?: boolean }>`
+  font-family: "Lucida Console", Courier, monospace;
   --color: ${(props) => (props.$error ? "red" : "green")};
   width: 1.5rem;
   border: 1px solid grey;
