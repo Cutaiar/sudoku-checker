@@ -164,8 +164,9 @@ function App() {
       <div>
         <Title>Visual Sudoku Check</Title>
         <Subtitle>
-          Select a sudoku from the list and watch as rows, columns, and regions
-          are validated
+          Select a sudoku from the list
+          <br />
+          Watch as rows, columns, and regions are validated
         </Subtitle>
       </div>
       <Visual>
