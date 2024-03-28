@@ -16,7 +16,7 @@ interface SudokuTestCaseValid extends SudokuTestCaseBase {
 
 type SudokuTestCase = SudokuTestCaseValid | SudokuTestCaseInvalid;
 
-// TODO: Make sure valid puzzles are valid and vice versa
+// TODO: Describe what groupType the errorIndex belongs to
 export const sudokus: SudokuTestCase[] = [
   {
     sudoku: [
@@ -106,36 +106,6 @@ export const sudokus: SudokuTestCase[] = [
     ],
     valid: false,
     errorIndex: 6,
-  },
-  {
-    sudoku: [
-      [4, 9, 8, 1, 7, 6, 5, 3, 2],
-      [3, 2, 5, 8, 4, 9, 1, 6, 7],
-      [6, 1, 7, 3, 2, 5, 9, 8, 4],
-      [8, 3, 1, 7, 5, 2, 6, 4, 9],
-      [5, 6, 9, 4, 8, 1, 7, 2, 3],
-      [2, 7, 4, 6, 9, 3, 8, 5, 1],
-      [7, 5, 3, 9, 1, 4, 2, 6, 8],
-      [9, 8, 2, 5, 6, 7, 4, 1, 3],
-      [1, 4, 6, 2, 3, 8, 5, 7, 9],
-    ],
-    valid: false,
-    errorIndex: 6,
-  },
-  {
-    sudoku: [
-      [9, 7, 8, 3, 2, 6, 5, 4, 1],
-      [5, 3, 1, 9, 4, 7, 2, 8, 6],
-      [2, 6, 4, 1, 8, 5, 7, 3, 9],
-      [7, 9, 2, 4, 6, 8, 3, 1, 5],
-      [1, 5, 6, 7, 3, 2, 9, 4, 8],
-      [3, 8, 4, 5, 1, 9, 6, 2, 7],
-      [6, 1, 7, 8, 5, 4, 2, 9, 3],
-      [4, 2, 9, 6, 7, 3, 1, 5, 8],
-      [8, 5, 3, 2, 9, 1, 4, 7, 6],
-    ],
-    valid: false,
-    errorIndex: 1,
   },
   {
     sudoku: [

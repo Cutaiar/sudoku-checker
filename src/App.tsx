@@ -35,17 +35,13 @@ export type Error = {
 
 function App() {
   // State for if a row, column, or group is highlighted
-  const [highlightedRow, setHighlightedRow] = useState<number | undefined>(
-    undefined,
-  );
-  const [highlightedCol, setHighlightedCol] = useState<number | undefined>(
-    undefined,
-  );
+  const [highlightedRow, setHighlightedRow] = useState<number | undefined>();
+  const [highlightedCol, setHighlightedCol] = useState<number | undefined>();
   const [highlightedRegion, setHighlightedRegion] = useState<
     number | undefined
-  >(undefined);
+  >();
 
-  // State for if an error is found
+  // State for loading and if an error was found
   const [error, setError] = useState<Error | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -57,7 +53,8 @@ function App() {
 
   // When the selectedSudokuIndex is changed, reset all highlighting and load the corresponding puzzle
   useEffect(() => {
-    // Reset highlighting
+    // Reset all state when puzzle is changed
+    // TODO: this is getting to be a lot, a reducer might be better
     setError(undefined);
     setIsLoading(true);
     setHighlightedRow(undefined);
@@ -103,10 +100,9 @@ function App() {
           default:
             break;
         }
-        await sleep(250);
+        await sleep(250); // TODO: Get a reference to this and cancel it on abort
 
         if (!isValid(group)) {
-          // console.log(`Error in ${type} ${i}`);
           setError({ type, index: i });
           return false;
         }

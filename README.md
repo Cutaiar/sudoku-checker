@@ -4,7 +4,7 @@
 
 Check a sudoku for validity and visualize the process. Live at [sudoku.cutaiar.io](https://sudoku.cutaiar.io).
 
-Written with `React` + `TypeScript` + `Vite`
+Written with `React` + `TypeScript` + `Vite`.
 
 ## Expanding the ESLint configuration
 
