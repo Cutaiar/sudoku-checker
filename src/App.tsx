@@ -3,6 +3,7 @@ import styled from "styled-components";
 import React from "react";
 import { Sudoku, sudokus } from "./sudokus";
 import { Readout } from "./Readout";
+import GithubCorner from "react-github-corner";
 
 /**
  * Build an array of regions where each region is an array of indices (i.e. [0,0]).
@@ -155,6 +156,11 @@ function App() {
 
   return (
     <Main>
+      <GithubCorner
+        href="https://github.com/Cutaiar/sudoku-checker"
+        octoColor="#242424"
+        bannerColor="white"
+      />
       <div>
         <Title>Visual Sudoku Checker</Title>
         <Subtitle>
