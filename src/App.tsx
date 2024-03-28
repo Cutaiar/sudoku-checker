@@ -50,12 +50,9 @@ function App() {
     setSudoku(sudokus[idx].sudoku);
   }, [idx]);
 
-  const rowHighlighted = (i: number) => {
-    return i === highlightedRow;
-  };
-
   const cellHighlighted = (i: number, j: number) => {
     return (
+      i === highlightedRow ||
       j === highlightedCol ||
       (highlightedRegion !== undefined &&
         groups[highlightedRegion].some((g) => g[0] === i && g[1] === j))
@@ -152,7 +149,7 @@ function App() {
         </SudokuList>
         <SudokuGrid>
           {sudoku.map((row, i) => (
-            <Row key={i} $highlighted={rowHighlighted(i)} $error={hasError}>
+            <Row key={i} $error={hasError}>
               {row.map((cell, j) => (
                 <Cell
                   key={j}
@@ -209,7 +206,7 @@ const SudokuListItem = styled.li<{ $valid: boolean; $selected?: boolean }>`
   &:hover {
     transform: scale(1.1);
   }
-  transition: transform;
+  transition: transform 100ms linear;
 `;
 
 const Cell = styled.span<{ $highlighted?: boolean; $error?: boolean }>`
@@ -219,6 +216,7 @@ const Cell = styled.span<{ $highlighted?: boolean; $error?: boolean }>`
   background-color: ${(props) =>
     props.$highlighted ? "var(--color)" : "transparent"};
   text-align: center;
+  transition: background-color 200ms linear;
 `;
 
 const Row = styled.div<{ $highlighted?: boolean; $error?: boolean }>`
