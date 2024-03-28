@@ -103,7 +103,7 @@ function App() {
           default:
             break;
         }
-        await sleep(300);
+        await sleep(250);
 
         if (!isValid(group)) {
           // console.log(`Error in ${type} ${i}`);
@@ -162,10 +162,10 @@ function App() {
         bannerColor="white"
       />
       <div>
-        <Title>Visual Sudoku Checker</Title>
+        <Title>Visual Sudoku Check</Title>
         <Subtitle>
-          Select a sudoku on the left and watch as its rows, columns, and
-          regions are checked
+          Select a sudoku from the list and watch as rows, columns, and regions
+          are validated
         </Subtitle>
       </div>
       <Visual>
@@ -218,6 +218,7 @@ const Main = styled.div`
   display: flex;
   flex-direction: column;
   gap: 32px;
+  padding: 8px;
 `;
 
 const Title = styled.h1`
@@ -229,11 +230,11 @@ const Title = styled.h1`
 const Subtitle = styled.p`
   color: grey;
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
 `;
 
 const SudokuGrid = styled.div`
-  border: 1px solid grey;
+  border: 0.5px solid grey;
   height: fit-content;
 `;
 
@@ -271,7 +272,7 @@ const Cell = styled.span<{ $highlighted?: boolean; $error?: boolean }>`
   font-family: "Lucida Console", Courier, monospace;
   --color: ${(props) => (props.$error ? "red" : "green")};
   width: 1.5rem;
-  border: 1px solid grey;
+  border: 0.5px solid grey;
   background-color: ${(props) =>
     props.$highlighted ? "var(--color)" : "transparent"};
   text-align: center;
