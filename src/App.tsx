@@ -4,9 +4,10 @@ import React from "react";
 import { Sudoku, sudokus } from "./sudokus";
 
 /**
- * Build an array of groups where each group is an array of indices (i.e. [0,0]).
+ * Build an array of regions where each region is an array of indices (i.e. [0,0]).
+ * This can be used later to get the actual values of the region or to highlight cells.
  */
-const buildGroupIndices = () => {
+const buildRegionIndicesIndices = () => {
   const groups: number[][][] = [];
   for (let i = 0; i < 9; i += 3) {
     for (let j = 0; j < 9; j += 3) {
@@ -22,50 +23,59 @@ const buildGroupIndices = () => {
   return groups;
 };
 
-const groups = buildGroupIndices();
+const regionIndices = buildRegionIndicesIndices();
 
 type GroupType = "row" | "col" | "region";
 
 function App() {
+  // State for if a row, column, or group is highlighted
   const [highlightedRow, setHighlightedRow] = useState<number | undefined>(
     undefined,
   );
   const [highlightedCol, setHighlightedCol] = useState<number | undefined>(
     undefined,
   );
-
   const [highlightedRegion, setHighlightedRegion] = useState<
     number | undefined
   >(undefined);
 
+  // State for if an error is found
   const [hasError, setHasError] = useState(false);
 
-  const [idx, setIdx] = useState(0);
-  const [sudoku, setSudoku] = useState<Sudoku>(sudokus[idx].sudoku);
+  // State for the selected sudoku
+  const [selectedSudokuIndex, setSelectedSudokuIndex] = useState(0);
+  const [sudoku, setSudoku] = useState<Sudoku>(
+    sudokus[selectedSudokuIndex].sudoku,
+  );
+
+  // When the selectedSudokuIndex is changed, reset all highlighting and load the corresponding puzzle
   useEffect(() => {
+    // Reset highlighting
     setHasError(false);
     setHighlightedRow(undefined);
     setHighlightedCol(undefined);
     setHighlightedRegion(undefined);
-    setSudoku(sudokus[idx].sudoku);
-  }, [idx]);
 
+    // Set the sudoku according to index
+    setSudoku(sudokus[selectedSudokuIndex].sudoku);
+  }, [selectedSudokuIndex]);
+
+  // Fn to decide when a cell is highlighted. Handles rows, cols, and regions
   const cellHighlighted = (i: number, j: number) => {
     return (
       i === highlightedRow ||
       j === highlightedCol ||
       (highlightedRegion !== undefined &&
-        groups[highlightedRegion].some((g) => g[0] === i && g[1] === j))
+        regionIndices[highlightedRegion].some((g) => g[0] === i && g[1] === j))
     );
   };
 
+  // Meat and potatoes. Simple Sudoku validation alg plus a little async and signal magic for visualization
   const validateSudoku = async (sudoku: Sudoku, signal: AbortSignal) => {
-    const isValid = (group: number[]) => {
-      const set = new Set(group);
-      return set.size === 9;
-    };
+    const isValid = (group: number[]) => new Set(group).size === 9;
     const transpose = (sudoku: Sudoku) =>
       sudoku[0].map((_, colIndex) => sudoku.map((row) => row[colIndex]));
+    const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
     const check = async (groups: number[][], type: GroupType) => {
       for (const [i, group] of groups.entries()) {
@@ -96,25 +106,33 @@ function App() {
       return true;
     };
 
-    const regions = groups.map((gi) =>
-      gi.map((indices) => sudoku[indices[0]][indices[1]]),
+    // Build the regions from the regionIndices array
+    const regions = regionIndices.map((region) =>
+      region.map((indices) => sudoku[indices[0]][indices[1]]),
     );
-    const toCheck: Record<GroupType, number[][]> = {
+
+    // Assemble a list of groups to check
+    const groups: Record<GroupType, number[][]> = {
       row: sudoku,
       col: transpose(sudoku),
       region: regions,
     };
-    for (const groupkv of Object.entries(toCheck)) {
-      const passed = await check(groupkv[1], groupkv[0] as GroupType);
+
+    for (const groupKV of Object.entries(groups)) {
+      // Break if any group did not pass
+      const passed = await check(groupKV[1], groupKV[0] as GroupType);
       if (!passed) {
         break;
       }
+
+      // After each group is checked, reset highlighting
       setHighlightedRow(undefined);
       setHighlightedCol(undefined);
       setHighlightedRegion(undefined);
     }
   };
 
+  // When a new puzzle is loaded, validate the sudoku after aborting any previous running validation
   React.useEffect(() => {
     const controller = new AbortController();
     validateSudoku(sudoku, controller.signal);
@@ -138,8 +156,8 @@ function App() {
             return (
               <SudokuListItem
                 $valid={s.valid}
-                $selected={i === idx}
-                onClick={() => setIdx(i)}
+                $selected={i === selectedSudokuIndex}
+                onClick={() => setSelectedSudokuIndex(i)}
                 key={i}
               >
                 {(s.valid ? "✅ " : "❌ ") + s.sudoku[0].join("")}
@@ -169,11 +187,6 @@ function App() {
 
 export default App;
 
-const SudokuGrid = styled.div`
-  border: 1px solid grey;
-  height: fit-content;
-`;
-
 const Visual = styled.div`
   display: flex;
   flex-direction: row;
@@ -184,6 +197,24 @@ const Main = styled.div`
   display: flex;
   flex-direction: column;
   gap: 32px;
+`;
+
+const Title = styled.h1`
+  font-size: 3.2rem;
+  line-height: 1.1;
+  margin: 0;
+`;
+
+const Subtitle = styled.p`
+  color: grey;
+  margin: 0;
+  margin-bottom: 32px;
+  font-size: 1.5rem;
+`;
+
+const SudokuGrid = styled.div`
+  border: 1px solid grey;
+  height: fit-content;
 `;
 
 const SudokuList = styled.ol`
@@ -226,18 +257,3 @@ const Row = styled.div<{ $highlighted?: boolean; $error?: boolean }>`
   background-color: ${(props) =>
     props.$highlighted ? "var(--color)" : "transparent"};
 `;
-
-const Title = styled.h1`
-  font-size: 3.2rem;
-  line-height: 1.1;
-  margin: 0;
-`;
-
-const Subtitle = styled.p`
-  color: grey;
-  margin: 0;
-  margin-bottom: 32px;
-  font-size: 1.5rem;
-`;
-
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
